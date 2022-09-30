@@ -1,0 +1,502 @@
+\documentclass{article}[12pt]
+
+\usepackage[a4paper, total={5.5in, 10in}]{geometry}
+
+
+\usepackage{cite}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+% \usepackage{hyperref}
+% \hypersetup{
+%     colorlinks=true,
+%     linkcolor=blue,
+%     filecolor=magenta,      
+%     urlcolor=cyan,
+%     pdftitle={Overleaf Example},
+%     pdfpagemode=FullScreen,
+%     }
+
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} \nameref*{#1}}} % One single link
+
+
+% Used for definitions
+\usepackage{amsthm}
+
+\newtheoremstyle{mydef}
+{\topsep}{\topsep}%
+{}{}%
+{\bfseries}{}
+{\newline}
+{%
+  \rule{\textwidth}{0.4pt}\\*%
+  \thmname{#1}~\thmnumber{#2}\thmnote{\ -\ #3}.\\*[-1.5ex]%
+  \rule{\textwidth}{0.4pt}
+}%
+
+\theoremstyle{mydef}
+
+% \theoremstyle{definition}
+\newtheorem*{definition}{Definition}
+\newtheorem*{proposition}{Proposition}
+\newtheorem*{theorem}{Theorem}
+
+\title{MNIST Report}
+\author{Christian Bauer - 01560011}
+
+% \date{\today}
+\date{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\listoffigures
+
+\pagebreak
+
+    \section{Introduction}
+    \label{sec: introduction}
+
+        In this report, the performance of three algorithms will be evaluated based on the \emph{MNIST dataset}.
+        For this purpose, the programming language \emph{Python} was chosen, 
+        and all experiments were done inside \emph{Jupyter notebooks}.
+        The algorithms are run in the main notebook called \texttt{mnist\_svm\_pca\_random\_forest.ipynb} after another, 
+        so the evaluation of each run is done on the same (randomly shuffled and sliced) dataset.
+        All gathered metrics are included in this repository in the folder \texttt{/results}.
+              
+
+            % \subsection{Planning in Robots}
+            % \label{sec:-planning-in-robots}
+            %     Placeholder
+
+            %     \paragraph{Singularities}
+            %     \label{par:-singularities}
+
+            %     % https://www.universal-robots.com/articles/ur/application-installation/what-is-a-singularity/
+            %         Singularities are situations, were a robot cannot reach a required position from the current positions of its joints or
+            %         it is physically not able to move to the required position.
+            %         The types of singularities found in the robot arm \textbf{UR 5} will be briefly described as follows:
+
+            %         \begin{description}
+            %             \item[Outer Workspace Limit]
+            %             \item[Inner Workspace Limit]
+            %             \item[Wrist Alignment Singularitiy]   
+            %         \end{description}
+                    
+                    
+            %         \begin{figure}[h!]
+            %             \centering
+            %             \caption{UR 5 Arm Workspace \cite{ur5workspace}}
+            %             \includegraphics[width=0.6\textwidth]{figures/ur5_workspace.png}
+            %             \label{fig:ur5_ws}
+            %         \end{figure}
+
+                
+      
+            % \begin{definition}[Reversibility]
+            %     \label{def:-s-reversible}
+            %     Let $\mathcal{F}$ be a set of facts, $\mathcal{A}$ be a set of actions, $S \subseteq 2^\mathcal{F}$ be a set of states, and $a \in \mathcal{A }$ be an action.
+            %     We call $a$ $S$-reversible \emph{iff} for every state $s \in S$ wherein $a$ is applicable there exists a sequence of actions $\pi = \left\langle a_1, \dots , a_n \right\rangle \in \mathcal{A}^n$ that is applicable in $a[s]$ and such that $\pi[a[s]] = s$.
+
+    % \section{Data Preparation}
+    % \label{sec:data-preparation}
+        
+    %     Since the \emph{MNIST dataset} is widely used for the evaluation of machine learning algorithms, 
+    %     data cleaning could be omitted and numerous options for downloading the data in different structures was available.
+    %     Because the chosen classification approaches are only capable of handling the hand-written letters as one-dimensional vectors, 
+    %     the variant \texttt{mnist\_784} by \emph{sklearn} was chosen, since it already alignes the $28 \times 28$ pixels of each image as a one-dimensional vector, thus, no reshaping was necessary.
+    %     Also, the label dataset is already split from the feature dataset in this approach, and both were used in separate \emph{Pandas dataframes} called \texttt{feature\_df} and \texttt{label\_df}.
+
+    %     To visualize a small portion of the dataset, the library \emph{matplotlib} is used. Since the features are stored in one-dimensional space, each selected sample needs to be reshaped back to two-dimensional space, which is done with the library \emph{numpy}.
+    %     The selection of this samples can be seen in the figure \ref{fig:mnist-sample-selection}.
+
+    %     \begin{figure}[!h]
+    %         \centering
+    %         \includegraphics[width=0.6\textwidth]{figures/sample_letters.png}
+    %         \caption{Sample Selection of the MNIST Dataset}
+    %         \label{fig:mnist-sample-selection}
+    %     \end{figure}
+
+    %     After retrieving and displaying the data, the next step is an \emph{index permutation}. 
+    %     This is done with \emph{numpy} and randomly permutates all indices for the feature and label datasets.
+    %     Those randomly shuffled feature and label datasets are then stored in the dataframes called \texttt{X, y} respectively, 
+    %     and the indices get reset, so the shuffled data has ascending indices.
+
+    %     Next, the feature and label datasets are split into training and test datasets. This split is shown in figure \ref{fig:splitting-datasets}, 
+    %     were the \texttt{split\_index} denotes the size of the training datasets of $10000$ feature and label elements, and the \texttt{end\_index} is defined as half the size of the former, 
+    %     and results in the test dataset being half the size of the training dataset with $5000$ feature and label elements. 
+
+    %     A separate training and test feature set is then prepared with PCA (see \ref{sec:svm-pca}) preprocessing, provided by the library \emph{sklearn}.
+    %     The separation is done to ensure a comparison next to the other algorithms, while still using the same features, just preprocessed.
+
+
+    %     \begin{figure}[h!]
+    %         \centering
+    %         \includegraphics[width=0.6\textwidth]{figures/dataset_split.png}
+    %         \caption{Splitting into Training and Test Datasets}
+    %         \label{fig:splitting-datasets}
+    %     \end{figure}
+
+    %     After the separation of the datasets, 
+    %     each classification algorithm is initialized with its specific parameters that are described in more detail in the corresponding sections.
+    %     For this, the library \emph{sklearn} is used, 
+    %     which provides a vast amount of parameters to optimize the algorithms and also provide 
+    %     the functions \texttt{<model\_name>.fit(X\_train, y\_train)} and \texttt{<model\_name>.predict(X\_test)} that will be used for the training and prediction of the datasets.
+    %     Each algorithm then will be fed the training features and labels to start the training loop with the function \texttt{<model\_name>.fit(X\_train, y\_train)}.
+    %     After the training is complete, the prediction is done for each algorithm with the function \texttt{<model\_name>.predict(X\_test)}. 
+    %     This function returns a prediction of the test feature dataset that is stored in a variable called \texttt{y\_prediction\_<model\_name>} for later comparison to the actual values.
+
+    %     As the final step the \emph{sklearn} modules \emph{classification report} and \emph{confusion matrix} are used to generate metrics that are used for comparison the predictive performance of the algorithms.
+
+
+    \section{Support Vector Machines (SVM)}
+    \label{sec:svm}
+
+        The module \texttt{SVC} (short for Support Vector Machines Classifier), 
+        by the library \texttt{sklearn} was chosen for the implementation of the SVM classifier.
+
+        \subsection{Parameters}
+            The used parameters for SVM performance benchmarks are as follows: 
+
+            \begin{itemize}
+                \item \textbf{C} - Regularization Parameter
+                    \begin{itemize}
+                        \item The parameters range $\{1, 2, 3, 4\}$.
+                        \item $C$ is a regularization parameter, and the strength of the regularization is inversely proportional to $C$.
+                    \end{itemize}
+
+                \item \textbf{gamma} - Kernel Coefficient
+                \begin{itemize}
+                    \item The parameters used are $\{0.1, 0.5, 1.0, scale\}$.
+                    \item Gamma is the kernel coefficient. 
+                    \item If the parameter scale is used, the formula $\frac{1}{n_f * var(X)}$ determines the value of gamma and $n_f$ denotes the number of features.
+                \end{itemize} 
+
+                \item \textbf{kernel}
+                \begin{itemize}
+                    \item The parameters for the kernel are linear, poly and sigmoid.
+                    \item Specifies the kernel type to be used in the algorithm.
+                \end{itemize}
+            \end{itemize}
+            Each of the parameters was applied separately, and no other parameters were used for the instantiation of a classifier,
+            therefore, it was using the default parameters if required.
+            
+        \subsection{Analysis of Training Time and Prediction Time}
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][SVM C - Training]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_C_train_time.png}}\quad
+                \subfloat[][SVM Gamma - Training]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_gamma_train_time.png}}\\
+                \subfloat[][SVM Kernel - Training]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_kernel_train_time.png}}\quad
+                \subfloat[][SVM Best Classifiers - Training]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_svm_estimators_train_time.png}}
+                \caption{SVM Training Time Measurement}
+                \label{fig:svm-train-time}
+            \end{figure}
+
+            \textbf{Training Time Performance Analysis}
+            \begin{description}
+                \item[Figure \ref{fig:svm-train-time} (a)] the regularization parameter $C$ is instantiated with 4 different values ranging from 1 to 4.
+                Each of them has a similar training time, with the higher values being slightly better, 
+                but each of the instances required more than 20 seconds for finishing the training training for the biggest training dataset.
+                \item[Figure \ref{fig:svm-train-time} (b)] the kernel coefficient called gamma is instantiated with for values $\{0.1, 0.5, 1.0, scale\}$. Deciding on a proper size for the kernel coefficient had a large impact on the required training time.
+                    While the parameter $scale$ took approx. 25 seconds to complete the training wit the largest dataset, the other mentioned gamma values required at least 200 seconds to complete their training.
+                \item[Figure \ref{fig:svm-train-time} (c)] SVM was instantiated with three different kernels, \emph{linear, poly} and \emph{sigmoid.} The training time had large variations as can be seen in the subfigure.
+                \item[Figure \ref{fig:svm-train-time} (d)] A selection of the best SVM instances that were chosen are the kernel coefficient scale and $0.1$ as well as the linear kernel instance that had the best training time performance.
+            \end{description}
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][SVM C - Prediction]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_C_predict_time.png}}\quad
+                    \subfloat[][SVM Gamma - Prediction]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_gamma_predict_time.png}}\\
+                    \subfloat[][SVM Kernel - Prediction]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_kernel_predict_time.png}}\quad
+                    \subfloat[][SVM Best Classifiers - Prediction]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_svm_estimators_predict_time.png}}
+                    \caption{SVM Prediction Time Measurement}
+                    \label{fig:svm-predict-time}
+                \end{figure}
+            \textbf{Prediction Time Performance Analysis}
+            As can be seen in the subfigures of figure \ref{fig:svm-predict-time}, the runtime performance regarding prediction behaved very similarly to the training for each instance of SVM.
+
+
+        \subsection{Analysis of Accuracy}
+
+            \begin{description}
+                \item[Figure \ref{fig:svm-train-time} (a)] the accuracy of the instances with regularization parameter $C$ increases steadily and the accuracy ranges from $91\%$ up to $97.5\%$.
+                \item[Figure \ref{fig:svm-train-time} (b)] the kernel coefficient called gamma is had a large impact on how well SVM was able to predict the MNIST dataset. The best performing instance was the \emph{scale} gamma, which is the result of the equation $\frac{1}{n_f * var(X)}$.
+                    Given the performance of the prediction, smaller gamma values did perform much better than gamma values over $0.5$.
+                \item[Figure \ref{fig:svm-train-time} (c)] SVM was instantiated with three different kernels had a similar behavior in terms of accuracy then it did with the training or prediction time, and the accuracy did alternate between being very poor with approx. $20 \%$ and very well with up to $90 \%$ accuracy.
+                \item[Figure \ref{fig:svm-train-time} (d)] A selection of the best SVM instances are compared in this subfigure in terms of accuracy and the best accuracy was achieved by the SVM instance with the regularization parameter $C$ set to $4$ with an accuracy of over $97.5\%$ after training on the largest dataset.
+            \end{description}
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][SVM C - Accuracy]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_C_accuracy.png}}\quad
+                \subfloat[][SVM Gamma - Accuracy]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_gamma_accuracy.png}}\\
+                \subfloat[][SVM Kernel - Accuracy]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/svm_kernel_accuracy.png}}\quad
+                \subfloat[][SVM Best Classifiers - Accuracy]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_svm_estimators_accuracy.png}}
+                \caption{SVM Accuracy Measurement}
+                \label{fig:svm-accuracy}
+            \end{figure}
+
+    \section{SVM with PCA Preprocessing}
+    \label{sec:svm-pca}
+
+
+        \subsection*{Parameters}
+        The used parameters for SVM with PCA preprocessing are as follows: 
+
+        \textbf{PCA Preprocessing}
+        \begin{itemize}
+            \item \textbf{Number of Components} 
+            \begin{itemize}
+                \item The parameters used for PCA preprocessing are $\{1, 3, 5, 10, 15\}$.
+                \item The number of components parameter sets how many components are kept after the PCA preprocessing step.
+                \item As default, the algorithm itself sets the number of components to $\min(n\_samples, n\_features) - 1$.
+            \end{itemize}
+        \end{itemize}
+
+        \textbf{SVM}
+        \begin{itemize}
+            \item \textbf{kernel} - linear, poly and sigmoid
+        \end{itemize}
+        
+        
+        Each of the PCA parameters was applied separately with each of the three kernel, and no other parameters were used for the instantiation of a classifier, 
+        therefore, it was using the default parameters if required.
+        
+        \subsection{Analysis of Training and Prediction Time}
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][PCA Linear Kernel]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_linear_kernel_train_time.png}}\quad
+                \subfloat[][PCA Poly Kernel]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_poly_kernel_train_time.png}}\\
+                \subfloat[][PCA Sigmoid Kernel]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_sigmoid_kernel_train_time.png}}\quad
+                \subfloat[][PCA Best Classifiers]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_pca_estimators_train_time.png}}
+                \caption{SVM with PCA Preprocessing Training Time Measurement}
+                \label{fig:pca-train-graphs}
+            \end{figure}
+
+            The PCA preprocessing that only kept one component afterwards had the worst time performance of all used variants. 
+            The PCA preprocessing with one component took about 2 to 5 seconds longer at the biggest dataset size.
+
+            % TODO n*log(n) or n^p?
+            The training and prediction time for every dataset step increase is not linear, as can be seen in the upwards curved lines in the figure \ref{fig:pca-train-graphs}.
+            The best performing kernels all were the ones that had a PCA preprocessing with 10 components kept (see figure \ref{fig:pca-train-graphs} (d)). 
+            This is likely due to the dataset having different 10 classes. 
+            Of the 
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][PCA Linear Kernel]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_linear_kernel_predict_time.png}}\quad
+                \subfloat[][PCA Poly Kernel]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_poly_kernel_predict_time.png}}\\
+                \subfloat[][PCA Sigmoid Kernel]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_sigmoid_kernel_predict_time.png}}\quad
+                \subfloat[][SVM Best Classifiers]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_pca_estimators_predict_time.png}}
+                \caption{SVM with PCA Preprocessing Prediction Time Measurement}
+                \label{fig:pca-predict-graphs}
+            \end{figure}
+
+        \subsection{Analysis of Accuracy}
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][PCA Linear Kernel]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_linear_kernel_accuracy.png}}\quad
+                \subfloat[][PCA Poly Kernel]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_poly_kernel_accuracy.png}}\\
+                \subfloat[][PCA Sigmoid Kernel]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/pca_sigmoid_kernel_accuracy.png}}\quad
+                \subfloat[][SVM Best Classifiers]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_pca_estimators_accuracy.png}}
+                \caption{SVM with PCA Preprocessing Accuracy}
+                \label{fig:pca-accuracy-graphs}
+            \end{figure}
+
+            In figure \ref{fig:pca-accuracy-graphs}(a, b, c), the accuracies of each SVM kernel instance and the used number of components are displayed.
+            Each SVM kernel instance with a PCA preprocessing and 10 remaining components outperformed every other configuration in terms of accuracy.
+            A common occurrence over all instances except the preprocessing with only one component kept, is that accuracy decreased immensely at the training size of 9000.
+            Also PCA preprocessing with only one or three components was not able to increase their accuracy with a larger dataset and kept their initial prediction accuracy.
+            Even the best classifier with a linear kernel and ten components kept, only had a maximum accuracy of slightly over $70\%$.
+
+    \section{Random Forest}
+    \label{sec:random-forest}
+
+        \subsection*{Parameters}
+        The used parameters for Random Forest (RF) are as follows: 
+
+        \begin{itemize}
+            \item \textbf{num estimators} - The number of estimators used for random forests is $\{1, 25, 50, 100\}$.
+            \item \textbf{max depth} - The maximum depth of a random forest used $\{1, 5, 10, Any\}$, where $Any$ denotes, that the depth decision lies with the inner algorithm.
+            \item \textbf{criterion} - The split criterion used for a random forest is either gini, entropy or log\_loss.
+        \end{itemize}
+        Each of the parameters was applied separately, and no other parameters were used for the instantiation of a classifier, therefore, it was using the default parameters if required.
+        
+        \subsection{Analysis of Training Time}
+
+
+            The training time was measured for training sizes from $2500$ to $20000$ with a step of $2500$. 
+            The results of the time measurement are displayed in figure \ref{fig:random-forest-training-time}. 
+            In this graph, the following subgraphs are included:
+
+            \begin{description}
+                \item[(a)] Random Forest that was trained using a specific criterion to split the decision tree nodes inside the random forest.
+                \item[(b)] Random Forest that was trained with a restriction, on how deep the tree is allowed to be. In the \texttt{forest\_depth\_Any} instance, 
+                the nodes are expanded until all leaves are pure or contain less than a minimum number of samples inside the node.
+                \item[(c)] Random Forest that was trained with a restricted number of estimators (trees) in the forest.
+                \item[(d)] A selection of the best Random Forests that were chosen regarding all three measurements (training time, prediction time and accuracy).
+            \end{description}
+            
+            
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][RF Criterion]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_criterion_train_time.png}}\quad
+                \subfloat[][RF Max Depth]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_depth_train_time.png}}\\
+                \subfloat[][RF Num Estimators]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_num_estimator_train_time.png}}\quad
+                \subfloat[][RF Best Classifiers]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_forest_estimators_train_time.png}}
+                \caption{Random Forest Training Time Measurement}
+                \label{fig:random-forest-training-time}
+              \end{figure}
+
+            The training time of all classifiers was increasing in a linear manner, 
+            as can be seen in the straight lines of every classifier and the linearly increasing training dataset size.
+            In subfigure \ref{fig:random-forest-training-time} (a), the best performing criterion was the \emph{Gini impurity criterion}, 
+            which did take one second less for the prediction of the largest portion of the dataset opposed to the other used criterions \emph{entropy} and \emph{log loss}.
+
+            In subfigure \ref{fig:random-forest-training-time} (b), the maximum allowed depth of the random forest trees were restricted in two of three measurements. 
+            These are displayed as the blue and orange line with a depth of 5 or 10 respectively. 
+            The green line displays the random forest that decides based on the purity of leave nodes and the number of samples inside a node, 
+            if a further split, and hence, more depth should take place.
+
+            In subfigure \ref{fig:random-forest-training-time} (c), the number of used estimators correlates to the required training time, 
+            more specifically, twice the number of estimators, requires twice the time to train the model.
+              
+ 
+
+        \subsection{Analysis of Prediction Time}
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][RF Criterion]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_criterion_predict_time.png}}\quad
+                \subfloat[][RF Max Depth]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_depth_predict_time.png}}\\
+                \subfloat[][RF Num Estimators]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_num_estimator_best_predict_time.png}}\quad
+                \subfloat[][RF Best Classifiers]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_forest_estimators_predict_time.png}}
+                \caption{Random Forest Prediction Time Measurement}
+                \label{fig:random-forest-prediction-time}
+            \end{figure}
+
+            The time it took for each random forest instantiation to predict values showed the same trend as the time for training each classifier.
+
+        \subsection{Analysis of Accuracy}
+
+
+            \begin{figure}[!h]
+                \centering
+                \subfloat[][RF Criterion]{
+                    \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_criterion_accuracy.png}}\quad
+                \subfloat[][RF Max Depth]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_depth_accuracy.png}}\\
+                \subfloat[][RF Num Estimators]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/forest_num_estimator_accuracy.png}}\quad
+                \subfloat[][RF Best Classifiers]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_forest_estimators_accuracy.png}}
+                \caption{Random Forest Classification Accuracy}
+                \label{fig:random-forest-classification-accuracy}
+            \end{figure}
+
+
+            All accuracy measurements of random forests can be seen in the plots of figure \ref{fig:random-forest-classification-accuracy}.
+            Each random forest criterion instance did obtain similar accuracy results in all test dataset sizes as can be seen in subfigure \ref{fig:random-forest-classification-accuracy} (a).
+            In subfigure \ref{fig:random-forest-classification-accuracy} (b), the random forest with a maximum depth of 5 was worse than the other two instances with either 10 as a maximum depth, or chosen by the algorithm itself, denoted as \emph{Any}.
+            The latter two had similar accuracy results, with the instance of \emph{Any} depth being better at the biggest datasize by approximatively $2\%$.
+            The number of estimators used surprisingly only increased the accuracy marginally once at least 25 estimators were used for the prediction.
+
+            The subfigure \ref{fig:random-forest-classification-accuracy} (d) displays the best three Random Forest classifiers. 
+            Note, the Random Forest instance with 50 estimators was chosen instead of the instance with 100 estimators, since it only has a slightly worse prediction performance but was twice as fast in training and predicting the datasets.
+
+
+    \section{Comparison of the Algorithms}
+    \label{sec:comparison}
+
+        In this section, one of the best overall performing classifier instance was chosen for a direct comparison. 
+        As the SVM instance, the best performing one is the \emph{gamma scale} instance.
+        For SVM with PCA preprocessing, the SVM instance with a linear kernel and PCA preprocessing that keeps ten components was chosen.
+        For Random Forests, the instance with 50 estimators was chosen. 
+        Note: While the instance with 100 estimators has a slightly better performance regarding the accuracy, the training and prediction time was also twice as high for the instance with 100 estimators as in the chosen instance.
+
+        The performance increase with SVM with a specific kernel and PCA processing (see figure \ref{fig:pca-train-graphs} (c)) opposed to regular SVM without preprocessing is almost three times as much, 
+        compared to the training times of SVM with a specific kernel (see figure \ref{fig:svm-train-time} (c)). This comparison is also included in the subfigure \ref{fig:best-classifiers}(a, b). 
+        Yet, the random forest instance with 50 estimators did outperform SVM in training time and prediction time in every dataset size.
+        At first, PCA preprocessing did help SVM to be even faster in training and prediction time compared to random forests (see table \ref{tab:training-best-estimators}), but after a dataset size of 10000 for training and 1000 for prediction, 
+        random forests was faster than SVM with PCA preprocessing again. 
+
+        % TODO Conclusion why Random Forests are awesome
+
+        % \begin{table}[h]
+        %     \centering
+        %     \begin{tabular}{llllll}
+        %                                  & 1000 & 5000 & 10000 & 15000 & 20000 \\
+        %     forest\_num\_estimators\_50  & 0.12 & 0.66 & 1.37  & 2.11  & 2.97  \\
+        %     svm\_gamma\_scale            & 0.15 & 1.70 & 6.93  & 14.10 & 22.53 \\
+        %     pca\_10\_svm\_kernel\_linear & 0.03 & 0.53 & 1.75  & 3.61  & 6.08 
+        %     \end{tabular}
+
+        % \end{table}
+
+        \begin{table}[]
+            \centering
+            \begin{tabular}{|l|l|l|l|l|l|}
+            \hline
+            \textbf{}                             & \textbf{1000} & \textbf{5000} & \textbf{10000} & \textbf{15000} & \textbf{20000} \\ \hline
+            \textbf{forest\_num\_estimators\_50}  & 0.12          & 0.66          & 1.37           & 2.11           & 2.97           \\ \hline
+            \textbf{svm\_gamma\_scale}            & 0.15          & 1.70          & 6.93           & 14.10          & 22.53          \\ \hline
+            \textbf{pca\_10\_svm\_kernel\_linear} & 0.03          & 0.53          & 1.75           & 3.61           & 6.08           \\ \hline
+            \end{tabular}
+            \caption{Training Time of best Classifiers in Seconds}
+            \label{tab:training-best-estimators}
+        \end{table}
+        
+        A numeric comparison of the accuracy over multiple test dataset sizes can be found in table \ref{tab:accuracy-best-estimators}. 
+        As can be seen in this table, the best accuracy was achieved by the SVM instance using a scaled gamma value with a value of $97.05\%$.
+        Notable is also that SVM did manage to get high accuracy performance even on smaller datasets, and if only looked at the accuracy, SVM with a scaled gamma did outperform the other two best estimators.
+        While PCA preprocessing did speed up the training and prediction of the MNIST dataset by as far as 3 times compared ro regular SVM instances, the accuracy did suffer a lot when using PCA preprocessing.
+        This trend was seen in all instances that used PCA, and even the best instance of PCA preprocessing only achieved a maximum of $55\%$ accuracy on the test dataset.
+        Therefor, while being really fast in comparison to classic SVM classification, the decline of accuracy when using PCA preprocessing was about $40\%$ in this test case scenario.
+
+        \begin{table}[h]
+            \centering
+            \begin{tabular}{|l|l|l|l|}
+            \hline
+                                                  & \textbf{1000} & \textbf{5000} & \textbf{10000} \\ \hline
+            \textbf{forest\_num\_estimators\_50}  & 0.876         & 0.9284        & 0.9555         \\ \hline
+            \textbf{svm\_gamma\_scale}            & 0.919         & 0.9466        & 0.9705         \\ \hline
+            \textbf{pca\_10\_svm\_kernel\_linear} & 0.439         & 0.5086        & 0.555          \\ \hline
+            \end{tabular}
+            \caption{Accuracy of best Classifiers}
+            \label{tab:accuracy-best-estimators}
+        \end{table}
+
+        \begin{figure}[!h]
+            \centering
+            \subfloat[][Best Classifiers Training Time]{
+                \includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_estimator_each_class_train_time.png}}\quad
+            \subfloat[][Best Classifiers Prediction Time]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_estimator_each_class_predict_time.png}}\\
+            \subfloat[][Best Classifiers Accuracy]{\includegraphics[width=.44\textwidth]{figures/results/analysis/figures/best_estimator_each_class_accuracy.png}}\quad
+            \caption{Best Classifiers of each Algorithm}
+            \label{fig:best-classifiers}
+        \end{figure}
+
+        \section{Conclusion}
+
+            Based on the retrieved results, the best approach of all three algorithms is Random Forest for this test case scenario. While only being slightly worse than a well defined SVM in terms of accuracy, 
+            Random Forests heavily outperformed SVM when training and prediction time was compared. 
+            Given the overall performance of Random Forests, and notably the fast prediction time even for very large datasets, it is the the recommended approach, if this prediction should be performed 
+            multiple times, or in a production system since the computing time is not a bottleneck compared to the other two approaches.
+
+
+% \pagebreak
+%     \bibliography{references}
+%     \bibliographystyle{unsrt}
+\end{document}
